@@ -175,6 +175,7 @@ onMounted(async () => {
 <template>
   <div class="game-container">
     <h1>Clueless</h1>
+
     <p class="description">
       Roll the dice and move them around to form words like a crossword puzzle!
     </p>
@@ -563,24 +564,49 @@ h1 {
 
 .instructions {
   margin-top: 30px;
+  text-align: center;
+  color: #595d62; /* Main/trunks */
+  font-size: 16px;
+  line-height: 24px;
   padding: 20px;
-  background-color: #f5f5f5; /* Main/goku */
-  border-radius: 8px;
-  border-left: 4px solid #4e46b4; /* Main/piccolo */
+  background-color: #f5f5f5; /* Main/goku to Main/beerus */
+  border-radius: 12px;
+  border: 1px solid #e2e2e2; /* Main/goku to Main/beerus */
+  box-shadow:
+    0px 6px 6px -6px rgba(0, 0, 0, 0.16),
+    0px 0px 1px 0px rgba(0, 0, 0, 0.4); /* shadow-sm */
 }
 
 .instructions h3 {
-  color: #000000; /* Main/popo */
   margin-top: 0;
+  margin-bottom: 12px;
+  color: #000000; /* Main/popo */
+  font-size: 20px;
   font-weight: 700;
+  line-height: 28px;
 }
 
 .instructions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   color: #595d62; /* Main/trunks */
-  line-height: 1.6;
 }
 
 .instructions li {
   margin-bottom: 8px;
+  position: relative;
+  padding-left: 16px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.instructions li::before {
+  content: '•';
+  color: #4e46b4; /* Main/piccolo */
+  font-size: 16px;
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 </style>
