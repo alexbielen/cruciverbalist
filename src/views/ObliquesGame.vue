@@ -681,27 +681,265 @@ onMounted(() => {
 @media (max-width: 768px) {
   .obliques-game {
     padding: 1rem;
+    max-width: 100%;
+  }
+
+  .navigation {
+    margin-bottom: 1.5rem;
+  }
+
+  .back-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 14px;
+  }
+
+  .game-header {
+    margin-bottom: 2rem;
   }
 
   .game-title {
     font-size: 2rem;
+    line-height: 1.1;
+  }
+
+  .how-to-play-btn {
+    width: 1.8rem;
+    height: 1.8rem;
+    font-size: 1rem;
+  }
+
+  .game-author {
+    font-size: 0.9rem;
+    margin: 0.75rem 0 0 0;
   }
 
   .puzzle-columns {
-    gap: 1rem;
+    gap: 1.5rem;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .puzzle-column {
+    min-width: auto;
+    width: 100%;
+    max-width: 280px;
+    align-items: center;
+  }
+
+  .clue-container {
+    text-align: center;
+    width: 100%;
   }
 
   .clue {
     font-size: 1.2rem;
+    line-height: 1.3;
+    text-align: center;
+  }
+
+  .arrow-container {
+    justify-content: center;
+    padding-left: 0;
+  }
+
+  .arrow {
+    font-size: 1.5rem;
+    margin: 0.25rem 0;
+  }
+
+  .answer-container {
+    justify-content: center;
+    min-width: auto;
+    width: 100%;
+  }
+
+  .letter-inputs {
+    gap: 0.15rem;
+  }
+
+  .letter-input {
+    width: 1.4rem;
+    height: 2rem;
+    font-size: 1.1rem;
+    margin: 0 0.1rem;
+    /* Touch-friendly improvements */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .correct-answer {
+    font-size: 1.1rem;
+  }
+
+  .controls-row {
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .hint-button,
+  .submit-button {
+    width: 100%;
+    max-width: 200px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+  }
+
+  .success-message {
+    margin-top: 1.5rem;
+    padding: 0.75rem;
+  }
+
+  .success-message p {
+    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .reset-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  /* Modal improvements for mobile */
+  .modal-content {
+    margin: 1rem;
+    padding: 1.5rem;
+    max-width: 90%;
+  }
+
+  .modal-content h2 {
+    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .modal-content p {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+  }
+
+  .modal-close {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .obliques-game {
+    padding: 0.75rem;
+  }
+
+  .game-title {
+    font-size: 1.8rem;
+  }
+
+  .clue {
+    font-size: 1.1rem;
+  }
+
+  .arrow {
+    font-size: 1.3rem;
+  }
+
+  .letter-input {
+    width: 1.3rem;
+    height: 1.8rem;
+    font-size: 1rem;
+  }
+
+  .correct-answer {
+    font-size: 1rem;
+  }
+
+  .hint-button,
+  .submit-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+  }
+
+  .success-message p {
+    font-size: 1.2rem;
+  }
+
+  .reset-button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .obliques-game {
+    padding: 0.5rem;
+  }
+
+  .game-header {
+    margin-bottom: 1rem;
+  }
+
+  .game-title {
+    font-size: 1.6rem;
+  }
+
+  .puzzle-columns {
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+  .puzzle-column {
+    max-width: 200px;
+  }
+
+  .clue {
+    font-size: 1rem;
   }
 
   .arrow {
     font-size: 1.2rem;
   }
 
+  .letter-input {
+    width: 1.2rem;
+    height: 1.6rem;
+    font-size: 0.9rem;
+  }
+
   .controls-row {
-    flex-direction: column;
-    gap: 1rem;
+    flex-direction: row;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .hint-button,
+  .submit-button {
+    max-width: 150px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Touch-friendly improvements for all mobile devices */
+@media (hover: none) and (pointer: coarse) {
+  .letter-input {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .hint-button,
+  .submit-button,
+  .back-button,
+  .reset-button,
+  .modal-close,
+  .how-to-play-btn {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    min-height: 44px; /* iOS recommended touch target size */
+  }
+
+  .how-to-play-btn {
+    min-width: 44px;
   }
 }
 </style>

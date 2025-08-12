@@ -26,4 +26,52 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* Mobile-friendly global styles */
+@media (max-width: 768px) {
+  /* Prevent text selection on interactive elements */
+  button,
+  input,
+  textarea {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  /* Improve touch targets */
+  button,
+  input,
+  textarea,
+  select {
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent zoom on input focus for iOS */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+
+  /* Smooth scrolling for mobile */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Prevent horizontal scrolling */
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  /* Reduce padding in landscape mode */
+  #app {
+    padding: 0;
+  }
+}
 </style>

@@ -159,6 +159,113 @@ const handleMouseUp = () => {
   }
 }
 
+// Touch event handlers for mobile support
+const handleTouchStart = (event: TouchEvent, die?: Die) => {
+  event.preventDefault()
+
+  if (die) {
+    // Handle individual die touch
+    gameStore.setDragging(die.id, true)
+    gameStore.setDraggedDie(die)
+
+    const touch = event.touches[0]
+    dragOffset.x = touch.clientX - die.position.x
+    dragOffset.y = touch.clientY - die.position.y
+  } else {
+    // Handle gameboard touch for selection
+    const touch = event.touches[0]
+    const gameboard = event.currentTarget as HTMLElement
+    const rect = gameboard.getBoundingClientRect()
+    const relativeX = touch.clientX - rect.left
+    const relativeY = touch.clientY - rect.top
+
+    isSelecting.value = true
+    selectionStart.x = relativeX
+    selectionStart.y = relativeY
+    gameStore.updateSelectionBox(relativeX, relativeY, relativeX, relativeY, true)
+    gameStore.clearSelection()
+  }
+}
+
+const handleTouchMove = (event: TouchEvent) => {
+  event.preventDefault()
+
+  const touch = event.touches[0]
+
+  if (gameStore.draggedDie && gameStore.draggedDie.isDragging) {
+    // Handle individual die dragging
+    const newX = touch.clientX - dragOffset.x
+    const newY = touch.clientY - dragOffset.y
+
+    // Keep die within gameboard bounds
+    const maxX = 740 // 800 - 60 (die width)
+    const maxY = 540 // 600 - 60 (die height)
+
+    gameStore.updateDiePosition(
+      gameStore.draggedDie.id,
+      Math.max(0, Math.min(newX, maxX)),
+      Math.max(0, Math.min(newY, maxY)),
+    )
+  } else if (isSelecting.value) {
+    // Handle selection box
+    const gameboard = document.querySelector('.gameboard') as HTMLElement
+    if (gameboard) {
+      const rect = gameboard.getBoundingClientRect()
+      const currentX = touch.clientX - rect.left
+      const currentY = touch.clientY - rect.top
+
+      gameStore.updateSelectionBox(selectionStart.x, selectionStart.y, currentX, currentY, true)
+
+      // Check which dice are in the selection box
+      gameStore.dice.forEach((die) => {
+        if (gameStore.isDieInSelectionBox(die)) {
+          gameStore.selectDie(die.id)
+        } else {
+          gameStore.deselectDie(die.id)
+        }
+      })
+    }
+  } else if (isDraggingSelection.value && gameStore.selectedDice.length > 0) {
+    // Handle moving selected dice as a group
+    const newAvgX = touch.clientX - dragOffset.x
+    const newAvgY = touch.clientY - dragOffset.y
+
+    // Calculate current average position
+    const currentAvgX =
+      gameStore.selectedDice.reduce((sum, d) => sum + d.position.x, 0) /
+      gameStore.selectedDice.length
+    const currentAvgY =
+      gameStore.selectedDice.reduce((sum, d) => sum + d.position.y, 0) /
+      gameStore.selectedDice.length
+
+    // Calculate the offset to move all dice
+    const offsetX = newAvgX - currentAvgX
+    const offsetY = newAvgY - currentAvgY
+
+    gameStore.moveSelectedDice(offsetX, offsetY)
+  }
+}
+
+const handleTouchEnd = (event: TouchEvent) => {
+  event.preventDefault()
+
+  if (gameStore.draggedDie) {
+    gameStore.setDragging(gameStore.draggedDie.id, false)
+    gameStore.setDraggedDie(null)
+  }
+
+  if (isSelecting.value) {
+    isSelecting.value = false
+    gameStore.updateSelectionBox(0, 0, 0, 0, false)
+  }
+
+  if (isDraggingSelection.value) {
+    isDraggingSelection.value = false
+    // Snap selected dice to grid when done dragging
+    gameStore.snapSelectedDiceToGrid()
+  }
+}
+
 // Initialize the game
 onMounted(async () => {
   gameStore.initializeDice()
@@ -169,6 +276,10 @@ onMounted(async () => {
   // Add global mouse event listeners
   document.addEventListener('mousemove', handleMouseMove)
   document.addEventListener('mouseup', handleMouseUp)
+
+  // Add global touch event listeners for mobile
+  document.addEventListener('touchmove', handleTouchMove, { passive: false })
+  document.addEventListener('touchend', handleTouchEnd, { passive: false })
 })
 </script>
 
@@ -184,7 +295,7 @@ onMounted(async () => {
 
     <div v-if="!gameStore.wordsLoaded" class="loading-indicator">Loading word dictionary...</div>
 
-    <div class="gameboard" @mousedown="handleGameboardMouseDown">
+    <div class="gameboard" @mousedown="handleGameboardMouseDown" @touchstart="handleTouchStart">
       <!-- Grid lines -->
       <div class="grid-lines">
         <div
@@ -214,6 +325,7 @@ onMounted(async () => {
           top: die.position.y + 'px',
         }"
         @mousedown="handleSelectedDieMouseDown($event, die)"
+        @touchstart="handleTouchStart($event, die)"
       >
         {{ die.currentLetter }}
       </div>
@@ -608,5 +720,194 @@ h1 {
   position: absolute;
   left: 0;
   top: 0;
+}
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .clueless-container {
+    padding: 20px 10px;
+    max-width: 100%;
+  }
+
+  .game-header {
+    margin-bottom: 20px;
+  }
+
+  .game-header h1 {
+    font-size: 32px;
+    line-height: 40px;
+  }
+
+  .game-header p {
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .game-controls {
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .control-group {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .roll-button,
+  .copy-button {
+    padding: 12px 20px;
+    font-size: 16px;
+    min-width: 120px;
+  }
+
+  .gameboard {
+    width: 100%;
+    max-width: 400px;
+    height: 300px;
+    margin: 0 auto;
+    border-radius: 12px;
+  }
+
+  .die {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+    border-radius: 6px;
+  }
+
+  .die.selected {
+    border-width: 3px;
+  }
+
+  .selection-box {
+    border-width: 2px;
+  }
+
+  .found-words {
+    margin-top: 20px;
+    padding: 0 10px;
+  }
+
+  .found-words h3 {
+    font-size: 18px;
+    line-height: 24px;
+    margin-bottom: 12px;
+  }
+
+  .found-word {
+    padding: 6px 12px;
+    font-size: 14px;
+    margin: 4px;
+  }
+
+  .instructions {
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 8px;
+  }
+
+  .instructions h3 {
+    font-size: 18px;
+    line-height: 24px;
+    margin-bottom: 10px;
+  }
+
+  .instructions li {
+    font-size: 13px;
+    line-height: 18px;
+    margin-bottom: 6px;
+  }
+
+  /* Touch-friendly improvements */
+  .die {
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  .gameboard {
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .clueless-container {
+    padding: 16px 8px;
+  }
+
+  .game-header h1 {
+    font-size: 28px;
+    line-height: 36px;
+  }
+
+  .gameboard {
+    max-width: 350px;
+    height: 250px;
+  }
+
+  .die {
+    width: 35px;
+    height: 35px;
+    font-size: 12px;
+  }
+
+  .roll-button,
+  .copy-button {
+    padding: 10px 16px;
+    font-size: 14px;
+    min-width: 100px;
+  }
+
+  .found-word {
+    padding: 4px 8px;
+    font-size: 12px;
+    margin: 2px;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  .clueless-container {
+    padding: 10px;
+  }
+
+  .game-header {
+    margin-bottom: 10px;
+  }
+
+  .game-header h1 {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  .game-controls {
+    flex-direction: row;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .gameboard {
+    max-width: 300px;
+    height: 200px;
+  }
+
+  .die {
+    width: 30px;
+    height: 30px;
+    font-size: 12px;
+  }
+
+  .found-words {
+    margin-top: 10px;
+  }
+
+  .instructions {
+    margin-top: 10px;
+    padding: 12px;
+  }
 }
 </style>
